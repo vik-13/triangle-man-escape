@@ -9,5 +9,6 @@ window.color = {
   ice: '#001933',
   stamina: '#023609',
   power: 'yellow',
-  white: '#b4b5b8'
+  white: '#ffffff'
+  // white: '#b4b5b8'
 };

@@ -1,32 +1,36 @@
 window.character = (() => {
   const MASS = .8;
   const MAX_SPEED = 4;
-  const MAX_STAMINA = 15;
-  const OUT_STAMINA_AT_WALL_JUMP = 2.5;
-  const OUT_STAMINA_AT_WALL = .07;
+  const MAX_LIFE = 100;
 
   let atFinalPosition = false;
   let finalOpacity = 1;
+
+  const state = {
+    jump: false,
+    fight: {
+      possible: true,
+      started: false,
+      startedTime: 0,
+      type: 0,
+    },
+  };
+
   let die = {
     isDead: false,
     dying: false
   };
+  let life = MAX_LIFE;
   let levelIsCompleted = false;
   let isGoingBack = false;
   let velocity = new V();
   let position;
-  const size = {x: 36, y: 59};
+  const size = {x: 60, y: 83};
   const jumpVector = new V(0, 20);
-  let jump = {
-    first: true,
-    second: false,
-    done: false
-  };
   let inAir = false;
+  let strongDrop = false;
   let lastMove = +new Date();
   let isRelaxing = false;
-
-  let stamina = MAX_STAMINA;
 
   function collision(position) {
     const collisionInfo = {
@@ -36,7 +40,12 @@ window.character = (() => {
     };
 
     map.getMap().enemy.forEach((block) => {
-      if (block.type === 8) {
+      if (block.type === 5) {
+        if (block.active && state.fight.started && !block.freeze.active &&
+          block.center().distance(position.get().add(new V(size.x / 2, size.y / 2))) < block.collisionRadius + 20) {
+          block.contact(20);
+        }
+      } else if (block.type === 8) {
         if (position.x + (size.x / 2) > block.x && position.x + (size.x / 2) < block.x + 120 && position.y >= block.y - 10) {
           const distance = position.y - block.y;
           if (distance < (400)) {
@@ -47,8 +56,6 @@ window.character = (() => {
         }
       } else if (block.type === 3) {
         if (block.active && block.center().distance(position.get().add(new V(size.x / 2, size.y / 2))) < block.collisionRadius + 20) {
-          jump.done = false;
-          stamina = MAX_STAMINA;
           block.destroy();
         }
       } else {
@@ -110,14 +117,26 @@ window.character = (() => {
     die.isDead = true;
   }
 
+  function checkDrop() {
+    map.getMap().enemy.forEach((block) => {
+      if (block.type === 5) {
+        if (block.active && !block.freeze.active &&
+          block.center().distance(position.get().add(new V(size.x / 2, size.y / 2))) < 300) {
+          block.contact(40);
+        }
+      }
+    });
+  }
+
   return {
     i: () => {
       position = map.getStart().get();
     },
     reset: () => {
+      life = MAX_LIFE;
       velocity = new V();
       position = map.getCharacterStart().get();
-      stamina = MAX_STAMINA;
+      // position = new V(200, 600);
       characterAnimations.mirror(position.x !== 0);
       die = {
         dying: false,
@@ -156,17 +175,7 @@ window.character = (() => {
       const collisionResult = collision(position);
 
       collisionResult.touches.forEach((item) => {
-        if (item.type === 1) {
-          if (velocity.y > 0) {
-            velocity.y = 0;
-          }
-          toDie();
-          return;
-        }
-
         if (item.side === 0 && velocity.y <= 0) {
-          stamina += .3;
-          if (stamina > MAX_STAMINA) stamina = MAX_STAMINA;
           position.y = item.intersect;
           velocity.y = 0;
           position.add(item.velocity);
@@ -183,51 +192,17 @@ window.character = (() => {
           }
         }
 
-        // if (item.side === 1) {
-        //   position.x = item.intersect;
-        //   if (control.pressed[0] && velocity.y < 0 && stamina > 0 && collisionResult.sides.indexOf(0) === -1) {
-        //     velocity = item.velocity;
-        //     characterAnimations.to('wall');
-        //     particles.addWall(position, -1);
-        //     stamina -= OUT_STAMINA_AT_WALL;
-        //
-        //     if (control.pressed[1]) {
-        //       if (jump.first) {
-        //         velocity.add(new V(20, 15));
-        //         characterAnimations.to('jump', false, true);
-        //         jump.first = false;
-        //         stamina -= OUT_STAMINA_AT_WALL_JUMP;
-        //       }
-        //     } else {
-        //       jump.first = true;
-        //     }
-        //   }
-        // }
-        //
-        // if (item.side === 3) {
-        //   position.x = item.intersect;
-        //   if (control.pressed[2] && velocity.y < 0 && stamina > 0 && collisionResult.sides.indexOf(0) === -1) {
-        //     velocity = item.velocity;
-        //     characterAnimations.to('wall');
-        //     particles.addWall(position, 1);
-        //     stamina -= OUT_STAMINA_AT_WALL;
-        //
-        //     if (control.pressed[1]) {
-        //       if (jump.first) {
-        //         velocity.add(new V(-20, 15));
-        //         characterAnimations.to('jump', false, true);
-        //         jump.first = false;
-        //         stamina -= OUT_STAMINA_AT_WALL_JUMP;
-        //       }
-        //     } else {
-        //       jump.first = true;
-        //     }
-        //   }
-        // }
-        // if (item.side === 2) {
-        //   position.y = item.intersect;
-        //   velocity.y = velocity.y >= 0 ? 0 : velocity.y;
-        // }
+
+        if (item.type === 0) {
+          if (item.side === 1 || item.side === 3) {
+            position.x = item.intersect;
+          }
+
+          if (item.side === 2) {
+            position.y = item.intersect;
+            velocity.y = velocity.y >= 0 ? 0 : velocity.y;
+          }
+        }
       });
 
       if (collisionResult.sides.indexOf(0) !== -1 && velocity.y <= 0) {
@@ -238,44 +213,41 @@ window.character = (() => {
         }
 
         if (control.pressed[1]) {
-          if (jump.first) {
+          if (!state.jump) {
             velocity.add(jumpVector);
             characterAnimations.to('jump', false, true);
-            jump.first = false;
+            state.jump = true;
           }
         }
 
-        if (!jump.first && !control.pressed[1]) {
-          jump.first = true;
-          jump.second = false;
-          jump.done = false;
+        if (state.jump && !control.pressed[1]) {
+          state.jump = false;
         }
 
         if (inAir) {
           characterAnimations.to('drop', true);
-          particles.addJump(position, velocity.x);
+          particles.addJump(position, velocity.x, strongDrop);
+          if (strongDrop) {
+            scene.doShake();
+            checkDrop();
+          }
           inAir = false;
+          strongDrop = false;
         }
       } else {
         inAir = true;
       }
 
-      if ((!collisionResult.sides.length || stamina < 0) && velocity.y < 0) {
+      if (!collisionResult.sides.length && velocity.y < 0) {
         if (!collisionResult.isOverFan) {
           characterAnimations.to('fall');
         }
 
-        if (control.pressed[1] && (jump.second || jump.first) && !inAir) {
+        if (control.pressed[1] && !state.jump && !inAir) {
           velocity.apply(new V(0, 15));
           characterAnimations.to('jump', false, true);
-          jump.first = false;
-          jump.second = false;
-          jump.done = true;
+          state.jump = true;
         }
-
-        // if (!control.pressed[1] && !jump.first && !jump.done) {
-        //   jump.second = true;
-        // }
       }
 
       if (!control.pressed[1] && velocity.y > 0) {
@@ -298,19 +270,62 @@ window.character = (() => {
         lastMove = +new Date();
       }
 
-      if (+new Date() - lastMove > 20000) {
-        if (!isRelaxing) {
-          isRelaxing = true;
-          characterAnimations.to(['dancing', 'sit'][rInt(0, 2)]);
+      // Fight
+      if (control.pressed[3] && state.fight.possible && !state.fight.started) {
+        state.fight.possible = false;
+        state.fight.started = true;
+        state.fight.type = rInt(0, 3);
+        // state.fight.type = 2;
+        state.fight.startedTime = +new Date();
+        velocity.x = 0;
+        if (state.fight.type === 0) {
+          // if (!inAir) {
+          //   velocity.add(new V(0, 5));
+          // }
+          characterAnimations.to('lowKick', true, true);
+        } else if (state.fight.type === 1) {
+          // if (!inAir) {
+          //   velocity.add(new V(0, 5));
+          // }
+          characterAnimations.to('highKick', true, true);
+        } else if (state.fight.type === 2) {
+          // if (!inAir) {
+          //   velocity.add(new V(0, 10));
+          // }
+          characterAnimations.to('backKick', true, true);
         }
-      } else {
-        isRelaxing = false;
       }
+
+      if (state.fight.started && +new Date() - state.fight.startedTime > 300) {
+        state.fight.started = false;
+      }
+
+      if (!control.pressed[3]) {
+        state.fight.possible = true;
+      }
+
+      if (control.pressed[4] && inAir) {
+        velocity.add(new V(0, -3));
+        strongDrop = true;
+      }
+
+      if (!inAir) {
+        strongDrop = false;
+      }
+
+      // if (+new Date() - lastMove > 20000) {
+      //   if (!isRelaxing) {
+      //     isRelaxing = true;
+      //     characterAnimations.to(['dancing', 'sit'][rInt(0, 2)]);
+      //   }
+      // } else {
+      //   isRelaxing = false;
+      // }
     },
     nFinal: () => {
       const maxSpeed = 1;
       if (!atFinalPosition) {
-        characterAnimations.to('slowWalk');
+        characterAnimations.to('walk');
 
         const acc = velocity.get().normalize().mult(-0.017);
         acc.add(new V(.1, 0));
@@ -322,7 +337,7 @@ window.character = (() => {
         if (position.x >= 1000 - (size.x / 2)) {
           position.x = 1000 - (size.x / 2);
           atFinalPosition = true;
-          characterAnimations.to('dancing');
+          characterAnimations.to('stay');
           setTimeout(() => {
             finalScene.i();
           }, 5000);
@@ -341,13 +356,6 @@ window.character = (() => {
       c.save();
       characterAnimations.r(position);
       c.restore();
-
-      if (stamina < MAX_STAMINA) {
-        c.save();
-        c.fillStyle = color.stamina;
-        c.fillRect(position.x -10, position.y + size.y + 10, stamina * 4 < 0 ? 0 : stamina * 6, 8);
-        c.restore();
-      }
     },
     rFinal: () => {
       c.save();

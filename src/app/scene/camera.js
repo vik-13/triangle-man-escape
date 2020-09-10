@@ -23,7 +23,8 @@ window.camera = (() => {
     n: () => {
       const characterPosition = character.position();
 
-      to.apply(new V(characterPosition.x - (gc.res.x / 2), characterPosition.y - (gc.res.y / 2)));
+      to.apply(new V(characterPosition.x - (gc.res.x / 2), 0));
+      // to.apply(new V(characterPosition.x - (gc.res.x / 2), characterPosition.y - (gc.res.y / 2)));
 
       if (to.x < 0) {
         to.x = 0;

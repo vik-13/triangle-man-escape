@@ -1,17 +1,25 @@
 window.scene = (() => {
   let bg;
+  let shake = {
+    active: false,
+    started: 0
+  };
 
   return {
     i: () => {
       bg = c.createLinearGradient(0, 0, 0, gc.res.y);
       // bg.addColorStop(0, 'hsl(37, 30%, 45%)');
       // bg.addColorStop(1, 'hsl(37, 30%, 10%)');
-      bg.addColorStop(0, 'hsl(48, 94%, 75%)');
-      bg.addColorStop(1, 'hsl(48, 94%, 30%)');
+      bg.addColorStop(0, 'hsl(188, 96%, 90%)');
+      bg.addColorStop(1, 'hsl(188, 96%, 65%)');
 
       background.i();
       map.i();
       character.i();
+    },
+    doShake: () => {
+      shake.active = true;
+      shake.started = +new Date();
     },
     reset: () => {
       background.reset();
@@ -35,6 +43,10 @@ window.scene = (() => {
         particles.n();
         camera.n();
       }
+
+      if (shake.active && +new Date() - shake.started >= 300) {
+        shake.active = false;
+      }
     },
     r: () => {
       c.save();
@@ -52,6 +64,10 @@ window.scene = (() => {
         }
 
         c.save();
+        if (shake.active) {
+          c.scale(1.05, 1.05);
+          c.translate(rInt(-5, 5) - 20, rInt(-5, 5) - 20);
+        }
         camera.r();
         map.r();
         if (map.isLast()) {
@@ -68,9 +84,9 @@ window.scene = (() => {
       c.translate(1250, 690);
       c.scale(.3, .3);
       if (gc.muted) {
-        draw.r([[[0,23,0,59,30,59,55,75,55,0,30,24],'','white',1]], [55, 75]);
+        draw.r([[[0, 23, 0, 59, 30, 59, 55, 75, 55, 0, 30, 24], '', 'white', 1]], [55, 75]);
       } else {
-        draw.r([[[0,27,0,64,30,63,55,80,55,4,30,28],'','white',1],[[59,28,60,57,65,57,64,28],'','white',1],[[66,18,67,64,71,64,71,19],'','white',1],[[73,8,75,72,80,72,79,8],'','white',1],[[83,0,84,81,89,81,87,0],'','white',1]], [89, 81]);
+        draw.r([[[0, 27, 0, 64, 30, 63, 55, 80, 55, 4, 30, 28], '', 'white', 1], [[59, 28, 60, 57, 65, 57, 64, 28], '', 'white', 1], [[66, 18, 67, 64, 71, 64, 71, 19], '', 'white', 1], [[73, 8, 75, 72, 80, 72, 79, 8], '', 'white', 1], [[83, 0, 84, 81, 89, 81, 87, 0], '', 'white', 1]], [89, 81]);
       }
       c.restore();
     }
