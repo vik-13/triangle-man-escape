@@ -41,9 +41,15 @@ window.character = (() => {
 
     map.getMap().enemy.forEach((block) => {
       if (block.type === 5) {
-        if (block.active && state.fight.started && !block.freeze.active &&
-          block.center().distance(position.get().add(new V(size.x / 2, size.y / 2))) < block.collisionRadius + 20) {
-          block.contact(20);
+        if (block.active && !block.freeze.active) {
+          const distance = block.center().distance(position.get().add(new V(size.x / 2, size.y / 2)));
+          if (state.fight.started && distance < block.collisionRadius + 20) {
+            block.contact(20);
+          } else if (Math.abs(block.center().x - position.get().x) < 350 && Math.abs(block.center().y - position.get().y) <= 150) {
+            block.follow(true);
+          } else if (block.following.active) {
+            block.follow();
+          }
         }
       } else if (block.type === 8) {
         if (position.x + (size.x / 2) > block.x && position.x + (size.x / 2) < block.x + 120 && position.y >= block.y - 10) {
@@ -122,7 +128,7 @@ window.character = (() => {
       if (block.type === 5) {
         if (block.active && !block.freeze.active &&
           block.center().distance(position.get().add(new V(size.x / 2, size.y / 2))) < 300) {
-          block.contact(40);
+          block.contact(50, true);
         }
       }
     });
@@ -146,6 +152,10 @@ window.character = (() => {
       inAir = false;
       levelIsCompleted = false;
       isGoingBack = false;
+    },
+    hit: (power) => {
+      life -= power;
+      particles.dying(position, [color.dying1, color.dying2, color.dying3, color.dying4]);
     },
     n: () => {
       if (die.dying) {
@@ -279,19 +289,10 @@ window.character = (() => {
         state.fight.startedTime = +new Date();
         velocity.x = 0;
         if (state.fight.type === 0) {
-          // if (!inAir) {
-          //   velocity.add(new V(0, 5));
-          // }
           characterAnimations.to('lowKick', true, true);
         } else if (state.fight.type === 1) {
-          // if (!inAir) {
-          //   velocity.add(new V(0, 5));
-          // }
           characterAnimations.to('highKick', true, true);
         } else if (state.fight.type === 2) {
-          // if (!inAir) {
-          //   velocity.add(new V(0, 10));
-          // }
           characterAnimations.to('backKick', true, true);
         }
       }
@@ -305,12 +306,16 @@ window.character = (() => {
       }
 
       if (control.pressed[4] && inAir) {
-        velocity.add(new V(0, -3));
+        velocity.add(new V(0, -4));
         strongDrop = true;
       }
 
       if (!inAir) {
         strongDrop = false;
+      }
+
+      if (life <= 0) {
+        toDie();
       }
 
       // if (+new Date() - lastMove > 20000) {
@@ -370,8 +375,10 @@ window.character = (() => {
       characterAnimations.r(new V(320, 350), 6);
       c.restore();
     },
+    size: () => size,
     position: () => position,
     isDead: () => die.isDead,
+    isDying: () => die.dying,
     levelIsCompleted: () => levelIsCompleted,
     isGoingBack: () => isGoingBack
   };
