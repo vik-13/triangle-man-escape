@@ -2,6 +2,7 @@ window.character = (() => {
   const MASS = .8;
   const MAX_SPEED = 4;
   const MAX_LIFE = 100;
+  const MAX_STAMINA = 100;
 
   let atFinalPosition = false;
   let finalOpacity = 1;
@@ -20,6 +21,7 @@ window.character = (() => {
     isDead: false,
     dying: false
   };
+  let stamina = 100;
   let life = MAX_LIFE;
   let levelIsCompleted = false;
   let isGoingBack = false;
@@ -51,20 +53,18 @@ window.character = (() => {
             block.follow();
           }
         }
-      } else if (block.type === 8) {
-        if (position.x + (size.x / 2) > block.x && position.x + (size.x / 2) < block.x + 120 && position.y >= block.y - 10) {
-          const distance = position.y - block.y;
-          if (distance < (400)) {
-            velocity.add(new V(0, 3 * (1 - distance / 400)));
-            characterAnimations.to('flying');
+      } else if (block.type === 6) {
+        if (block.active && !block.freeze.active) {
+          const distance = block.center().distance(position.get().add(new V(size.x / 2, size.y / 2)));
+          if (state.fight.started && distance < block.collisionRadius + 20) {
+            block.contact(30);
+          } else if (Math.abs(block.center().x - position.get().x) < 450 && Math.abs(block.center().y - position.get().y) <= 150) {
+            block.follow(true);
+          } else if (block.following.active) {
+            block.follow();
           }
-          collisionInfo.isOverFan = true;
         }
-      } else if (block.type === 3) {
-        if (block.active && block.center().distance(position.get().add(new V(size.x / 2, size.y / 2))) < block.collisionRadius + 20) {
-          block.destroy();
-        }
-      } else {
+      } else if (block.type !== 7 && block.type !== 8) {
         if (block.center().distance(position.get().add(new V(size.x / 2, size.y / 2))) < block.collisionRadius + 20) {
           toDie();
         }
@@ -125,7 +125,7 @@ window.character = (() => {
 
   function checkDrop() {
     map.getMap().enemy.forEach((block) => {
-      if (block.type === 5) {
+      if (block.type === 5 || block.type === 6) {
         if (block.active && !block.freeze.active &&
           block.center().distance(position.get().add(new V(size.x / 2, size.y / 2))) < 300) {
           block.contact(50, true);
@@ -142,7 +142,6 @@ window.character = (() => {
       life = MAX_LIFE;
       velocity = new V();
       position = map.getCharacterStart().get();
-      // position = new V(200, 600);
       characterAnimations.mirror(position.x !== 0);
       die = {
         dying: false,
@@ -165,6 +164,9 @@ window.character = (() => {
         velocity.add(acc);
         position.add(velocity);
         return false;
+      } else {
+        life = life >= 100 ? 100 : life + .02;
+        stamina = stamina >= 100 ? 100 : stamina + .3;
       }
 
       const acc = velocity.get().normalize().mult(-0.017);
@@ -272,8 +274,12 @@ window.character = (() => {
 
       if (position.y + size.y < 0) toDie(true);
 
-      if (position.x >= map.getEnd().x + 40) {
-        levelIsCompleted = true;
+      if (position.x >= map.getEnd().x + 20) {
+        if (map.isEmpty()) {
+          levelIsCompleted = true;
+        } else {
+          position.x = map.getEnd().x + 20;
+        }
       }
 
       if (control.pressed[0] || control.pressed[1] || control.pressed[2]) {
@@ -305,9 +311,10 @@ window.character = (() => {
         state.fight.possible = true;
       }
 
-      if (control.pressed[4] && inAir) {
-        velocity.add(new V(0, -4));
+      if (control.pressed[4] && inAir && stamina === MAX_STAMINA) {
+        velocity.add(new V(0, -20));
         strongDrop = true;
+        stamina = 0;
       }
 
       if (!inAir) {
@@ -372,7 +379,8 @@ window.character = (() => {
     },
     rSplashScreen: () => {
       c.save();
-      characterAnimations.r(new V(320, 350), 6);
+      characterAnimations.to('sit');
+      characterAnimations.r(new V(380, 270), 1);
       c.restore();
     },
     size: () => size,
@@ -380,6 +388,10 @@ window.character = (() => {
     isDead: () => die.isDead,
     isDying: () => die.dying,
     levelIsCompleted: () => levelIsCompleted,
-    isGoingBack: () => isGoingBack
+    isGoingBack: () => isGoingBack,
+    life: () => life,
+    maxLife: () => MAX_LIFE,
+    stamina: () => stamina,
+    maxStamina: () => MAX_STAMINA
   };
 })();

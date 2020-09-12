@@ -55,6 +55,12 @@ window.characterAnimations = (() => {
       [[[-8, 14, 49, -6, 27, 30], [31, 32, 37, 55, 52, 26], [27, 33, 3, 82, 26, 61], [39, 2, 31, 6, 37, 8]], [[8, 2, -22, 55, 24, 35], [23, 40, 4, 83, 5, 54], [39, 30, 95, 14, 68, 31], [-10, 42, -4, 34, -1, 40]], [0, 0, 0, 0]],
       120,
       true
+    ],
+    sit: [
+      [[[35,0,76,44,34,38],'', 'black',1],[[33,40,20,64,59,63],'', 'black',1],[[33,39,0,63,46,63],'', 'black',1],[[63,35,56,29,56,35],'', 'red',1]],
+      [[[32,0,76,41,33,38],0,0,[62,34,55,28,55,35]],[0,0,0,[63,35,56,29,58,33]]],
+      1000,
+      false
     ]
   };
 
@@ -109,6 +115,15 @@ window.characterAnimations = (() => {
       }
     },
     r: (position, scale) => {
+      let s = scale || 1;
+      c.translate(position.x + (size[0] / 2), position.y + (size[1] / 2));
+      c.scale(mirrored ? -s : s, -s);
+      draw.r(current.n(), size);
+      if (isBlocked && current.isFinished()) {
+        next();
+      }
+    },
+    rSplash: (position, scale) => {
       let s = scale || 1;
       c.translate(position.x + (size[0] / 2), position.y + (size[1] / 2));
       c.scale(mirrored ? -s : s, -s);

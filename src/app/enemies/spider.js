@@ -1,4 +1,4 @@
-function Spider(type, x, y, d) {
+function Spider(type, x, y) {
   const getNext = () => {
     let next = rInt(-300, 300);
     if (this.x + next < 0 || this.x + next > 2000) {
@@ -114,6 +114,8 @@ function Spider(type, x, y, d) {
         this.freeze.direction = character.position().x < this.x ? .2 : -.2;
         current = new Anim(...gList.hit);
       }
+      this.hitting.active = false;
+      this.hitting.possible = true;
     }
   };
 

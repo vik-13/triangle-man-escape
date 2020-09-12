@@ -4,10 +4,10 @@
 
   window.gc = {
     res: {x: 1280, y: 720},
+    started: false,
     start: +new Date(),
     last: +new Date(),
     paused: false,
-    splashScreen: true,
     graphicsQuality: 1,
     muted: false,
     changeQuality: (value) => {
@@ -40,7 +40,9 @@
     live();
 
     gc.canvas.addEventListener('click', (e) => {
-      if (gc.splashScreen) gc.splashScreen = false;
+      if (!gc.started) {
+        gc.started = true;
+      }
       gc.ac = window.AudioContext ? new AudioContext() : new window.webkitAudioContext();
     });
   }
