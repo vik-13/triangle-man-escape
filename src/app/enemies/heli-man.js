@@ -9,7 +9,7 @@ function HeliMan(type, x, y) {
 
   this.type = type;
   this.x = x;
-  this.y = y;
+  this.y = y + rInt(-40, 40);
   this.active = true;
   this.collisionRadius = 70;
 
@@ -75,8 +75,8 @@ function HeliMan(type, x, y) {
           const distance = this.hitting.position.distance(character.position().get().add(new V(character.size().x / 2, character.size().y / 2)));
           if (distance < 300) {
             character.hit(POWER * ((300 - distance) / 300));
-            scene.doShake(true);
           }
+          scene.doShake(true);
         }
       } else {
         if (+new Date() - this.hitting.last >= this.hitting.next && Math.abs((character.position().x + (character.size().x / 2)) - (this.x + 22)) < 200) {

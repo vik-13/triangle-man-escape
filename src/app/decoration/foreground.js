@@ -1,4 +1,4 @@
-window.background = (() => {
+window.foreground = (() => {
   let bShift = rInt(0, 470);
   let type = 0;
 
@@ -18,11 +18,9 @@ window.background = (() => {
     },
     r: () => {
       c.save();
-      c.translate(1100 - bShift - (camera.getPosition().x / 2), 370 + (camera.getPosition().y / 2));
-      c.globalAlpha = .8;
-      c.scale(20, -20);
+      c.translate(1100 - bShift - (camera.getPosition().x * 2), 340 + (camera.getPosition().y * 2));
+      c.scale(40, -40);
       draw.r(backgroundObjects[type], [102, 36]);
-      c.globalAlpha = 1;
       c.restore();
     }
   };

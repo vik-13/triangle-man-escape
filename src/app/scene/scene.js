@@ -14,6 +14,7 @@ window.scene = (() => {
       bg.addColorStop(1, 'hsl(188, 96%, 65%)');
 
       background.i();
+      foreground.i();
       map.i();
       character.i();
     },
@@ -24,6 +25,7 @@ window.scene = (() => {
     },
     reset: () => {
       background.reset();
+      foreground.reset();
       map.reset();
       character.reset();
       particles.reset();
@@ -51,12 +53,6 @@ window.scene = (() => {
       c.fillRect(0, 0, gc.res.x, gc.res.y);
       c.restore();
 
-      if (map.isLast()) {
-        finalScene.rBackground();
-      } else {
-        background.r();
-      }
-
       c.save();
       if (shake.active) {
         if (shake.light) {
@@ -67,6 +63,13 @@ window.scene = (() => {
           c.translate(rInt(-5, 5) - 20, rInt(-5, 5) - 20);
         }
       }
+
+      if (map.isLast()) {
+        finalScene.rBackground();
+      } else {
+        background.r();
+      }
+
       camera.r();
       map.r();
       if (map.isLast()) {
@@ -103,6 +106,8 @@ window.scene = (() => {
         c.restore();
       }
       c.restore();
+
+      foreground.r();
 
       c.save();
       c.translate(1250, 20);

@@ -17,6 +17,15 @@ window.map = (() => {
     // #last
     [[0, 0, 0, 32, 1], [6, 0, 1, 1, 1], [7, 31, 1, 1, 1]]
   ];
+  // 0 - fire,
+
+  const additions = [
+    // objects, background, foreground
+    // #1
+    [[[0, 29, 1]], 1, 0],
+    // #2
+    [[[0, 29, 1]], 1, 1]
+  ];
   let backward = false;
 
   let mapData = {
@@ -30,8 +39,9 @@ window.map = (() => {
     mapData = {
       map: [],
       enemy: [],
+      additions: [],
       start: new V(),
-      end: new V(49 * scale, 0)
+      end: new V(49 * scale, 0),
     };
     levels[currentLevel].forEach((item) => {
       if (item[0] === 5) {
@@ -46,6 +56,22 @@ window.map = (() => {
         mapData.map.push(new Block(item[0], item[1] * scale, item[2] * scale, item[3] * scale, item[4] * scale, (typeof item[5] !== 'undefined' ? new V(item[5], item[6]) : new V()).get().mult(scale)));
       }
     });
+
+    if (additions[currentLevel]) {
+      additions[currentLevel][0].forEach((addition) => {
+        if (!addition[0]) {
+          mapData.additions.push(new Fire(addition[1] * scale, addition[2] * scale));
+        }
+      });
+
+      if (typeof additions[currentLevel][1] !== 'undefined') {
+        background.set(additions[currentLevel][1]);
+      }
+
+      if (typeof additions[currentLevel][2] !== 'undefined') {
+        foreground.set(additions[currentLevel][2]);
+      }
+    }
   }
 
   return {
@@ -65,6 +91,10 @@ window.map = (() => {
           item.n();
         }
       });
+
+      mapData.additions.forEach((item) => {
+        item.n();
+      });
     },
     r: () => {
       mapData.map.forEach((item) => {
@@ -75,18 +105,10 @@ window.map = (() => {
           item.r();
         }
       });
-    },
-    rSplashScreen: () => {
-      mapData.map.forEach((item) => {
+
+      mapData.additions.forEach((item) => {
         item.r();
       });
-      mapData.enemy.forEach((item) => {
-        if (item.active) {
-          item.r();
-        }
-      });
-
-      prison.rSplash();
     },
     getMap: () => mapData,
     currentLevel: () => currentLevel,
