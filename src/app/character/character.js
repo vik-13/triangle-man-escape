@@ -335,7 +335,7 @@ window.character = (() => {
       // }
     },
     nFinal: () => {
-      const maxSpeed = 1;
+      const maxSpeed = 4;
       if (!atFinalPosition) {
         characterAnimations.to('walk');
 

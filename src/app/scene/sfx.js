@@ -2,16 +2,16 @@ window.sfx = (() => {
   let lastFX = +new Date();
 
   function playShort(frequency, time, volume) {
-    // if (gc.muted) return false;
-    // const o = gc.ac.createOscillator();
-    // const g = gc.ac.createGain();
-    // o.type = 'triangle';
-    // o.connect(g);
-    // g.connect(gc.ac.destination);
-    // o.frequency.value = frequency;
-    // o.start(0);
-    // g.gain.value = volume || 1;
-    // g.gain.exponentialRampToValueAtTime(0.00001, gc.ac.currentTime + (time || .5));
+    if (gc.muted) return false;
+    const o = gc.ac.createOscillator();
+    const g = gc.ac.createGain();
+    o.type = 'triangle';
+    o.connect(g);
+    g.connect(gc.ac.destination);
+    o.frequency.value = frequency;
+    o.start(0);
+    g.gain.value = volume || 1;
+    g.gain.exponentialRampToValueAtTime(0.00001, gc.ac.currentTime + (time || .5));
   }
 
   return {
@@ -50,6 +50,12 @@ window.sfx = (() => {
     },
     highKick: () => {
       playShort(89.41, .1);
+    },
+    shoot: () => {
+      playShort(51.91, .3);
+    },
+    bomb: () => {
+      playShort(89.41, 1);
     },
   };
 })();

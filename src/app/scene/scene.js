@@ -107,7 +107,9 @@ window.scene = (() => {
       }
       c.restore();
 
-      foreground.r();
+      if (!map.isLast()) {
+        foreground.r();
+      }
 
       c.save();
       c.translate(1250, 20);
@@ -120,21 +122,21 @@ window.scene = (() => {
       c.restore();
 
       c.save();
-      c.translate(10, 690);
-      c.fillStyle = color.white;
-      c.fillRect(0, 0, 304, 24);
-      c.fillStyle = color.life;
-      const life = (character.life() / character.maxLife()) * 300;
-      c.fillRect(2, 2, life < 0 ? 0 : life, 20);
+      c.translate(10 + 146, 700);
+      c.scale(1, -1);
+      draw.r([[[2,3,0,29,68,30,282,26,290,0,132,3],'','white',1]], [290, 30]);
+      c.fillStyle = '#A90011';
+      const life = (character.life() / character.maxLife()) * 275;
+      c.fillRect(-140, -10, life < 0 ? 0 : life, 20);
       c.restore();
 
       c.save();
-      c.translate(976, 690);
-      c.fillStyle = color.white;
-      c.fillRect(0, 0, 304, 24);
-      c.fillStyle = color.stamina;
-      const stamina = (character.stamina() / character.maxStamina()) * 300;
-      c.fillRect(2, 2, stamina < 0 ? 0 : stamina, 20);
+      c.translate(1280 - 145, 700);
+      c.scale(-1, -1);
+      draw.r([[[2,3,0,29,68,30,282,26,290,0,132,3],'','white',1]], [290, 30]);
+      c.fillStyle = '#0089FF';
+      const stamina = (character.stamina() / character.maxStamina()) * 275;
+      c.fillRect(-140, -10, stamina < 0 ? 0 : stamina, 20);
       c.restore();
     }
   };

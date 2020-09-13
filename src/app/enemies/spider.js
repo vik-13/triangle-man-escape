@@ -146,6 +146,7 @@ function Spider(type, x, y) {
     if (this.hitting.active && +new Date() - this.hitting.started >= this.hitting.next) {
       if (character.position().get().x - this.x < 125 && character.position().get().x - this.x > -25 && Math.abs(this.y - character.position().get().y) <= 100) {
         character.hit(POWER);
+        setTimeout(() => { sfx.lowKick(); }, 120);
         current = new Anim(...gList.kick);
         this.hitting.started = +new Date();
       }

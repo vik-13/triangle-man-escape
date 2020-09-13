@@ -10,6 +10,6 @@ window.color = {
   life: 'red',
   stamina: '#023609',
   power: 'yellow',
-  white: '#ffffff'
+  white: '#D9D9D0'
   // white: '#b4b5b8'
 };

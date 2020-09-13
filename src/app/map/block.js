@@ -9,7 +9,7 @@ function Block(type, x, y, w, h, d) {
   this.active = true;
 
   const colors = [color.black, color.black, color.ice, color.black];
-  const nails = [[[0, 8, 40, 8, 35, 0, 34, 6, 23, 1, 21, 5, 15, 7, 11, 1, 8, 6, 3, 1], 'black', 'black', 1]];
+  const nails = [[[0,14,40,14,40,0,27,7,15,1,6,4,0,0],'black','black',1]];
   const gHolder = [[[12, 0, 0, 22, 11, 40, 40, 36, 40, 4], '', 'black', 1], [[19, 16, 16, 20, 19, 24, 24, 23, 26, 17], '', 'mechanics', 1]];
   const speed = 2;
 
@@ -75,24 +75,7 @@ function Block(type, x, y, w, h, d) {
         draw.r(nails, [40, 8]);
       }
       c.restore();
-      // RIGHT
-      c.save();
-      c.rotate(Math.PI / 2);
-      c.translate(-20, -this.w - 4);
-      for (let i = 0; i < Math.floor(this.h / 40); i++) {
-        c.translate(40, 0);
-        draw.r(nails, [40, 8]);
-      }
-      c.restore();
-      // LEFT
-      c.save();
-      c.rotate(-Math.PI / 2);
-      c.translate(-this.h - 20, -4);
-      for (let i = 0; i < Math.floor(this.h / 40); i++) {
-        c.translate(40, 0);
-        draw.r(nails, [40, 8]);
-      }
-      c.restore();
+
       c.fillStyle = color.black;
       c.fillRect(0, 0, this.w, this.h);
     } else {

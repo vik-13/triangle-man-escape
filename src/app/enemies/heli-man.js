@@ -76,6 +76,7 @@ function HeliMan(type, x, y) {
           if (distance < 300) {
             character.hit(POWER * ((300 - distance) / 300));
           }
+          sfx.bomb();
           scene.doShake(true);
         }
       } else {

@@ -49,8 +49,8 @@ window.finalScene = (() => {
     },
     rBackground: () => {
       let bg = c.createLinearGradient(0, 0, 0, gc.res.y);
-      bg.addColorStop(0, 'hsl(238, 10%, 30%)');
-      bg.addColorStop(1, 'hsl(238, 10%, 10%)');
+      bg.addColorStop(0, 'hsl(47, 95%, 80%)');
+      bg.addColorStop(1, 'hsl(47, 95%, 40%)');
       c.save();
       c.fillStyle = bg;
       // c.fillStyle = '#000000';

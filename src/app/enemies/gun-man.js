@@ -9,7 +9,7 @@ function GunMan(type, x, y, d) {
 
   const POWER = 30;
   const BOMB_SPEED = 8;
-  const BOMB_LIVE_TIME = 2000;
+  const BOMB_LIVE_TIME = 1000;
   const FREEZE_TIME = 700;
   const WALKING_SPEED = 1;
   const FOLLOWING_SPEED = 1.7;
@@ -80,6 +80,10 @@ function GunMan(type, x, y, d) {
 
   this.follow = (visible) => {
     if (visible) {
+      if (!this.following.active) {
+        this.hitting.possible = false;
+        this.hitting.started = +new Date();
+      }
       this.following.active = true;
       this.following.lastSeen = +new Date();
     } else {
@@ -100,6 +104,7 @@ function GunMan(type, x, y, d) {
       this.hitting.position = new V(this.x + 10, this.y + 34);
       this.hitting.direction = character.position().get().x - (this.x + 36) > 0 ? 1: -1;
       this.hitting.started = +new Date();
+      sfx.shoot();
       current = new Anim(...gList.kick);
       setTimeout(() => {
         current = new Anim(...gList.walk);
@@ -155,6 +160,7 @@ function GunMan(type, x, y, d) {
 
       if (character.position().get().add(new V(character.size().x / 2, character.size().y / 2)).distance(this.hitting.position.get().add(new V(11, 8))) < 30) {
         character.hit(POWER);
+        sfx.lowKick();
         this.hitting.started = +new Date();
         this.hitting.active = false;
       }
@@ -164,7 +170,7 @@ function GunMan(type, x, y, d) {
       }
     }
 
-    if (!this.hitting.possible && !this.hitting.active && +new Date() - this.hitting.started > 500) {
+    if (!this.hitting.possible && !this.hitting.active && +new Date() - this.hitting.started > 1000) {
       this.hitting.possible = true;
       current = new Anim(...gList.walk);
     }
