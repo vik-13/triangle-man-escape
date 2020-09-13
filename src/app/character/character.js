@@ -290,8 +290,7 @@ window.character = (() => {
       if (control.pressed[3] && state.fight.possible && !state.fight.started) {
         state.fight.possible = false;
         state.fight.started = true;
-        state.fight.type = rInt(0, 3);
-        // state.fight.type = 2;
+        state.fight.type = rInt(0, 4);
         state.fight.startedTime = +new Date();
         velocity.x = 0;
         if (state.fight.type === 0) {
@@ -300,6 +299,8 @@ window.character = (() => {
           characterAnimations.to('highKick', true, true);
         } else if (state.fight.type === 2) {
           characterAnimations.to('backKick', true, true);
+        } else if (state.fight.type === 3) {
+          characterAnimations.to('headKick', true, true);
         }
       }
 

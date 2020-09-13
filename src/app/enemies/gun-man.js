@@ -170,7 +170,7 @@ function GunMan(type, x, y, d) {
       }
     }
 
-    if (!this.hitting.possible && !this.hitting.active && +new Date() - this.hitting.started > 1000) {
+    if (!this.hitting.possible && !this.hitting.active && +new Date() - this.hitting.started > 700) {
       this.hitting.possible = true;
       current = new Anim(...gList.walk);
     }

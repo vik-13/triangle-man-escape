@@ -34,12 +34,6 @@ window.sfx = (() => {
     die: () => {
       playShort(61.74, 3);
     },
-    fallingBlock: () => {
-      playShort(51.91, 5);
-    },
-    takePower: () => {
-      playShort(220.00, .5);
-    },
     flying: () => {
       if (+new Date() - lastFX < 30) return;
       playShort(27.50, .5);
