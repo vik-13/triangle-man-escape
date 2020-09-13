@@ -53,7 +53,6 @@ function FireParticle(type) {
 }
 
 function Fire(x, y) {
-  console.log(x, y);
   const torch = new Anim(
     [[[3,60,3,24,0,1,3,2,6,2,9,0,6,29,7,60],'','black',1]],
     []
