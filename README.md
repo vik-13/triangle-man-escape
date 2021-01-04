@@ -1,6 +1,8 @@
 # Triangle-man: Escape
 
-## Small game created especially for `js13k`
+Link to play: https://js13kgames.com/entries/triangle-man-escape
+
+## Small game created for `js13k`
 
 Another little story of triangle man! Can you try to get out of cave? It isn't that easy as you think. 
 
